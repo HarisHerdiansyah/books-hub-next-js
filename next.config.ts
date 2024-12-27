@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   env: {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    DATABASE_URL: process.env.DATABASE_URL,
+    // DATABASE_URL: process.env.DATABASE_URL,
     DIRECT_URL: process.env.DIRECT_URL,
   },
   images: {
