@@ -29,10 +29,7 @@ export const authOptions: AuthOptions = {
         });
         if (!userAccount) return null;
 
-        const isValid =
-          process.env.MODE === 'development'
-            ? cred.password === '12345678'
-            : await bcrypt.compare(cred.password, userAccount.password);
+        const isValid = await bcrypt.compare(cred.password, userAccount.password);
         if (!isValid) return null;
 
         const userData = await db.users.findUnique({

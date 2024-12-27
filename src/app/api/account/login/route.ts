@@ -36,6 +36,7 @@ export async function POST(req: Request) {
       {
         success: false,
         message: 'Login error',
+        error: e,
       },
       { status: 500 }
     );
