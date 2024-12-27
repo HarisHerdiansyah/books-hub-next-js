@@ -6,7 +6,7 @@ type UpdateProfilePayload = {
   firstName: string;
   lastName: string;
   about?: string;
-  photo: File;
+  photo?: File;
 };
 
 export async function updateUserProfile(payload: UpdateProfilePayload) {
@@ -17,7 +17,7 @@ export async function updateUserProfile(payload: UpdateProfilePayload) {
     formData.append('firstName', payload.firstName);
     formData.append('lastName', payload.lastName);
     formData.append('about', payload.about || '');
-    formData.append('photo', payload.photo);
+    formData.append('photo', payload.photo as File);
 
     const response = await api.post('/api/user/update', formData, {
       headers: {

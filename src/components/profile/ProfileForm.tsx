@@ -13,19 +13,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { updateUserProfile } from '@/service/user';
 
+const isBrowser = typeof window !== 'undefined' && typeof File !== 'undefined';
+
 const profileSchema = z.object({
   bio: z.string().min(1, 'Bio is required.'),
   firstName: z.string().min(1, 'First name is required.'),
   lastName: z.string().min(1, 'Last name is required.'),
   about: z.string().max(200, "About can't exceed 200 characters."),
-  photo: z
-    .instanceof(File)
-    .refine(
-      (file) => file.size <= 5 * 1024 * 1024,
-      'File size should be less than 5MB.'
-    ),
+  photo: isBrowser
+    ? z
+        .instanceof(File)
+        .refine(
+          (file) => file.size <= 5 * 1024 * 1024,
+          'File size should be less than 5MB.'
+        )
+    : z.any(),
 });
-
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 function ProfileForm() {
@@ -86,7 +89,9 @@ function ProfileForm() {
           />
         </div>
         {errors.photo && (
-          <p className='text-red-500 text-sm'>{errors.photo.message}</p>
+          <p className='text-red-500 text-sm'>
+            {errors.photo.message as string}
+          </p>
         )}
       </div>
       <div>
@@ -150,6 +155,6 @@ function ProfileForm() {
       </div>
     </form>
   );
-};
+}
 
 export default ProfileForm;
