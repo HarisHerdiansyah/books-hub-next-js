@@ -1,0 +1,64 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres", "relationJoins"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Accounts {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  createdAt  DateTime @default(now())
+  username   String   @unique
+  firstLogin Boolean  @default(true)
+  users      Users?
+}
+
+model Users {
+  userId    String   @id @default(uuid())
+  username  String   @unique
+  firstName String   @default("")
+  lastName  String   @default("")
+  bio       String   @default("")
+  imageUrl  String   @default("")
+  about     String?
+  accounts  Accounts @relation(fields: [username], references: [username])
+  books     Books[]
+}
+
+model Books {
+  user         Users        @relation(fields: [userId], references: [userId])
+  userId       String
+  username     String       @default("")
+  userImageUrl String       @default("")
+  bookId       String       @id @default(uuid())
+  title        String       @default("")
+  writers      String[]     @default([])
+  writersText  String       @default("")
+  year         Int          @default(1970)
+  isDone       Boolean      @default(false)
+  isFav        Boolean      @default(false)
+  isPin        Boolean      @default(false)
+  views        Int          @default(0)
+  categories   String[]     @default([])
+  visibility   Boolean      @default(true)
+  bookDetail   BookDetail?
+  pinnedBooks  PinnedBooks?
+}
+
+model BookDetail {
+  books       Books  @relation(fields: [bookId], references: [bookId])
+  bookId      String @id
+  rating      Float
+  description String
+}
+
+model PinnedBooks {
+  books  Books  @relation(fields: [bookId], references: [bookId])
+  bookId String @id
+}
