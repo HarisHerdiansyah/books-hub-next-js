@@ -6,7 +6,7 @@ import { db } from './db';
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(db),
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
   },
