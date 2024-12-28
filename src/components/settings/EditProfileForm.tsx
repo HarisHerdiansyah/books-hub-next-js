@@ -15,6 +15,7 @@ import { editUserProfile } from '@/service/user';
 import Spinner from '../general/Spinner';
 import { useToast } from '@/hooks';
 import { toasterProps } from '@/lib/constants';
+import { AxiosError } from 'axios';
 
 const settingsSchema = z.object({
   username: z
@@ -74,10 +75,12 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
       replace(`/${payload.username}/overview`);
       toast({ ...toasterProps.editProfile.resolve(), variant: 'success' });
     } catch (e: unknown) {
-      toast({
-        ...toasterProps.editProfile.reject(e.response.data.message),
-        variant: 'destructive',
-      });
+      if (e instanceof AxiosError && e.response) {
+        toast({
+          ...toasterProps.editProfile.reject(e.response.data.message),
+          variant: 'destructive',
+        });
+      }
     }
   };
 
