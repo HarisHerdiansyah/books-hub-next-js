@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useToast, { Toast } from './use-toast';
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 
 type ActionToastType = {
   resolve: () => Omit<Toast, 'variant'>;
@@ -20,9 +20,8 @@ export default function useAsyncToast() {
     try {
       await asyncFn();
       if (type) toast({ ...type.resolve(), variant: 'success' });
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e: unknown) {
-      if (type)
+      if (type && e instanceof AxiosError && e.response)
         toast({
           ...type.reject(e.response.data.message),
           variant: 'destructive',
