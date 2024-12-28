@@ -1,5 +1,6 @@
 import api from '@/lib/api';
 import { axiosErrorLogger } from '@/lib/utils';
+// import { redirect } from 'next/navigation';
 
 type UpdateProfilePayload = {
   bio: string;
@@ -28,4 +29,8 @@ export async function updateUserProfile(payload: UpdateProfilePayload) {
   } catch (e) {
     axiosErrorLogger(e);
   }
+}
+
+export async function editUserProfile(payload: Partial<UpdateProfilePayload>) {
+  await api.patch('/api/user/update', { ...payload });
 }

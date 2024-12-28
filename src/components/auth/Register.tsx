@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { register as userRegister } from '@/service/account';
 import Spinner from '../general/Spinner';
-import { useToast } from '@/hooks';
+import { useAsyncToast } from '@/hooks';
 import { toasterProps } from '@/lib/constants';
 
 const registerSchema = z
@@ -41,19 +41,13 @@ function RegisterForm() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
-  const { toast } = useToast();
+  const { execute, loading } = useAsyncToast();
 
-  const onSubmit = async (data: RegisterFormValues) => {
-    try {
-      await userRegister(data);
-      toast({ variant: 'success', ...toasterProps.register.resolve });
-    } catch (e) {
-      toast({ variant: 'destructive', ...toasterProps.register.reject });
-      throw e;
-    }
+  const onSubmit = (data: RegisterFormValues) => {
+    execute(async () => await userRegister(data), toasterProps.register);
   };
 
-  if (isSubmitting) {
+  if (loading) {
     return <Spinner />;
   }
 

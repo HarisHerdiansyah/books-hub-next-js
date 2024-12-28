@@ -14,73 +14,103 @@ export const CATEGORIES_DROPDOWN = CATEGORIES.map((c) => ({
 
 export const toasterProps = {
   setBookDone: {
-    resolve: {
+    resolve: () => ({
       title: 'Success',
       description: 'Book marked as done',
-    },
-    reject: {
-      title: 'Error',
-      description: 'Failed to mark book as done',
-    },
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed change book to done',
+      description: msg,
+    }),
   },
   toggleFavourite: {
-    resolve: {
+    resolve: () => ({
       title: 'Success',
       description: 'Book marked as favourite',
-    },
-    reject: {
-      title: 'Error',
-      description: 'Failed to mark book as favourite',
-    },
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed mark book as favourite',
+      description: msg,
+    }),
   },
   deleteBook: {
-    resolve: {
+    resolve: () => ({
       title: 'Success',
       description: 'Book deleted',
-    },
-    reject: {
-      title: 'Error',
-      description: 'Failed to delete book',
-    },
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed delete book data',
+      description: msg,
+    }),
   },
   updatePinnedBooks: {
-    resolve: {
+    resolve: () => ({
       title: 'Success',
       description: 'Pinned books updated',
-    },
-    reject: {
-      title: 'Error',
-      description: 'Failed to update pinned books',
-    },
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed update pins',
+      description: msg,
+    }),
   },
   logout: {
-    resolve: {
+    resolve: () => ({
       title: 'Success',
       description: 'Logged out',
-    },
-    reject: {
-      title: 'Error',
-      description: 'Failed to logout',
-    },
+    }),
+    reject: (msg: string) => ({
+      title: 'Logout failed',
+      description: msg,
+    }),
   },
   register: {
-    resolve: {
+    resolve: () => ({
       title: 'Success',
       description: 'Registered successfully',
-    },
-    reject: {
-      title: 'Error',
-      description: 'Failed to register',
-    },
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed registering new user',
+      description: msg,
+    }),
   },
   login: {
-    resolve: {
+    resolve: () => ({
       title: 'Success',
       description: 'Logged in successfully',
-    },
-    reject: {
-      title: 'Error',
-      description: 'Failed to login',
-    },
-  }
-}
+    }),
+    reject: (msg: string) => ({
+      title: 'Login failed',
+      description: msg,
+    }),
+  },
+  editProfile: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'Updating profile successfully',
+    }),
+    reject: (msg: string) => ({
+      title: 'Update failed',
+      description: msg,
+    }),
+  },
+  addNewBook: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'New book is added',
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed adding new book',
+      description: msg,
+    }),
+  },
+  editBook: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'Book is updated',
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed updating book',
+      description: msg,
+    }),
+  },
+};

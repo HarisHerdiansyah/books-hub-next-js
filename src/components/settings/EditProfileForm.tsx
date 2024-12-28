@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import Image from 'next/image';
+import ProfilePhotoForm from './ProfilePhotoForm';
+import { editUserProfile } from '@/service/user';
+import Spinner from '../general/Spinner';
+import { useToast } from '@/hooks';
+import { toasterProps } from '@/lib/constants';
 
 const settingsSchema = z.object({
   username: z
@@ -20,7 +25,6 @@ const settingsSchema = z.object({
   lastName: z.string().min(1, 'Last name is required.'),
   bio: z.string().optional(),
   about: z.string().max(200, 'About must not exceed 200 characters.'),
-  photo: z.instanceof(FileList).optional(),
 });
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
@@ -36,8 +40,10 @@ type UserFormProps = {
 function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
   const { about, bio, imageUrl, username, firstName, lastName } =
     userProps as UserFormProps;
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(imageUrl);
 
+  const { update } = useSession();
+  const { replace } = useRouter();
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -53,55 +59,37 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
     },
   });
 
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const onSubmit = async (data: SettingsFormValues) => {
+    const prev = { about, bio, username, firstName, lastName };
+    const payload: Partial<SettingsFormValues> = {};
+
+    (Object.keys(prev) as (keyof SettingsFormValues)[]).forEach((k) => {
+      if (data[k] !== prev[k]) {
+        payload[k] = data[k];
+      }
+    });
+    try {
+      await editUserProfile(payload);
+      await update({ username: payload.username });
+      replace(`/${payload.username}/overview`);
+      toast({ ...toasterProps.editProfile.resolve(), variant: 'success' });
+    } catch (e: unknown) {
+      toast({
+        ...toasterProps.editProfile.reject(e.response.data.message),
+        variant: 'destructive',
+      });
     }
   };
 
-  const onSubmit = (data: SettingsFormValues) => {
-    /* eslint-disable no-console */
-    console.log('Form Data:', data);
-  };
+  if (isSubmitting) {
+    return <Spinner />;
+  }
 
   return (
     <Card className='w-full border border-[#392467]'>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-          <div className='mt-6 flex flex-col sm:flex-row items-center justify-center gap-4'>
-            <div className='flex flex-col items-center'>
-              <Label className='mb-3'>Profile Photo</Label>
-              {avatarPreview ? (
-                <Image
-                  src={avatarPreview}
-                  alt='Avatar Preview'
-                  width={100}
-                  height={100}
-                  className='rounded-full'
-                />
-              ) : (
-                <div className='w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center'>
-                  <span className='text-gray-600'>No Photo</span>
-                </div>
-              )}
-            </div>
-            <div className='max-w-[300px]'>
-              <Input
-                type='file'
-                accept='image/*'
-                {...register('photo')}
-                onChange={(e) => {
-                  register('photo').onChange(e);
-                  handleAvatarChange(e);
-                }}
-              />
-            </div>
-          </div>
+        <ProfilePhotoForm initialImageUrl={imageUrl} />
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6 mt-8'>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
             <div>
               <Label htmlFor='username'>Username</Label>

@@ -22,9 +22,5 @@ export async function login(payload: LoginPayload) {
 }
 
 export async function register(payload: RegisterPayload) {
-  try {
-    await api.post('/api/account/register', payload);
-  } catch (e) {
-    axiosErrorLogger(e);
-  }
+  return await api.post('/api/account/register', payload);
 }

@@ -29,7 +29,10 @@ export const authOptions: AuthOptions = {
         });
         if (!userAccount) return null;
 
-        const isValid = await bcrypt.compare(cred.password, userAccount.password);
+        const isValid = await bcrypt.compare(
+          cred.password,
+          userAccount.password
+        );
         if (!isValid) return null;
 
         const userData = await db.users.findUnique({
@@ -49,7 +52,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.image = user.image;
@@ -58,6 +61,10 @@ export const authOptions: AuthOptions = {
         token.fullName = user.fullName;
         token.bio = user.bio;
         token.about = user.about;
+      }
+
+      if (trigger === 'update') {
+        token.username = session.username;
       }
       return token;
     },

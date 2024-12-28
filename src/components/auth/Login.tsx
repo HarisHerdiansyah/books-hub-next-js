@@ -35,21 +35,27 @@ function LoginForm() {
   const { toast } = useToast();
 
   const onSubmit = async (data: LoginFormValues) => {
-    try {
-      await signIn('credentials', { redirect: false, ...data });
-      const currentSession = await getSession();
-      if (currentSession?.user.firstLogin) {
-        router.replace('/input-profile');
-        toast({ variant: 'success', ...toasterProps.login.resolve });
-        return;
-      }
-      router.replace(`/${currentSession?.user.username}/overview`);
-      toast({ variant: 'success', ...toasterProps.login.resolve });
+    const response = await signIn('credentials', { redirect: false, ...data });
+    if (!response?.ok) {
+      toast({
+        variant: 'destructive',
+        ...toasterProps.login.reject(
+          response?.status === 401
+            ? 'Unauthorized account'
+            : 'Something is wrong. Try again later'
+        ),
+      });
       return;
-    } catch (e) {
-      toast({ variant: 'destructive', ...toasterProps.login.reject });
-      throw e;
     }
+
+    const currentSession = await getSession();
+    if (currentSession?.user.firstLogin) {
+      router.replace('/input-profile');
+    } else {
+      router.replace(`/${currentSession?.user.username}/overview`);
+    }
+    toast({ variant: 'success', ...toasterProps.login.resolve() });
+    return;
   };
 
   if (isSubmitting) {

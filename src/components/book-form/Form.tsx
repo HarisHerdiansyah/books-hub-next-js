@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import Select from 'react-select';
 import { z } from 'zod';
+import { FaTimes } from 'react-icons/fa';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,9 +14,10 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import Spinner from '@/components/general/Spinner';
 import { addNewBook, updateBook } from '@/service/book';
-import { FaTimes } from 'react-icons/fa';
-import { CATEGORIES_DROPDOWN } from '@/lib/constants';
+import { CATEGORIES_DROPDOWN, toasterProps } from '@/lib/constants';
+import { useAsyncToast } from '@/hooks';
 
 const bookSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
@@ -101,6 +103,7 @@ function Form({ mode, book }: FormProps) {
 
   const router = useRouter();
   const session = useSession();
+  const { execute, loading } = useAsyncToast();
 
   const onAddWriters = () => {
     const writer = getValues('writers');
@@ -129,151 +132,163 @@ function Form({ mode, book }: FormProps) {
       categories: data.categories.map((ctg) => ctg.value),
     };
     if (mode === 'edit') {
-      await updateBook(book.bookId, payload);
+      execute(
+        async () => await updateBook(book.bookId, payload),
+        toasterProps.editBook
+      );
     } else {
-      await addNewBook(payload);
+      execute(async () => await addNewBook(payload), toasterProps.addNewBook);
     }
     router.replace(`/${session.data?.user.username}/books?page=1`);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='w-full'>
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
-        <div>
-          <Label htmlFor='title'>Title</Label>
-          <Input
-            autoComplete='off'
-            id='title'
-            type='text'
-            placeholder='Enter book title'
-            {...register('title')}
-          />
-          {errors.title && (
-            <p className='text-red-500 text-sm'>{errors.title.message}</p>
-          )}
-        </div>
-        <div>
-          <div className='flex items-end gap-x-4'>
-            <div className='w-full'>
-              <Label htmlFor='writer'>
-                Writer (For multiple writer, separate with comma)
-              </Label>
-              <Input
-                autoComplete='off'
-                id='writer'
-                type='text'
-                placeholder='Ex: John Doe, Jessica'
-                {...register('writers')}
-              />
-            </div>
-            <Button
-              type='button'
-              variant='outline-dark-blue'
-              className='w-[80px]'
-              onClick={onAddWriters}
-            >
-              Add
-            </Button>
-          </div>
-          {isWritersEmpty && (
-            <p className='text-red-500 text-sm'>Writer is required!</p>
-          )}
-          <div className='flex gap-3 items-center flex-wrap mt-3'>
-            {writers.map((w, i) => (
-              <Badge variant='blue' key={w}>
-                {w}
-                <FaTimes
-                  className='ml-2 cursor-pointer hover:text-red-600 w-3 h-3'
-                  onClick={() => onDeleteWriters(i)}
-                />
-              </Badge>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-        <div>
-          <Label htmlFor='year'>Year</Label>
-          <Input
-            id='year'
-            type='number'
-            placeholder='Enter publication year'
-            {...register('year', {
-              setValueAs: (value) => parseInt(value, 10),
-            })}
-          />
-          {errors.year && (
-            <p className='text-red-500 text-sm'>{errors.year.message}</p>
-          )}
-        </div>
-        <div>
-          <Label htmlFor='categories'>Categories</Label>
-          <Controller
-            name='categories'
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                isMulti
-                options={CATEGORIES_DROPDOWN}
-                styles={customStyles}
-                placeholder='Select categories'
-              />
+    <>
+      {loading && <Spinner />}
+      <form onSubmit={handleSubmit(onSubmit)} className='w-full'>
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
+          <div>
+            <Label htmlFor='title'>Title</Label>
+            <Input
+              autoComplete='off'
+              id='title'
+              type='text'
+              placeholder='Enter book title'
+              {...register('title')}
+            />
+            {errors.title && (
+              <p className='text-red-500 text-sm'>{errors.title.message}</p>
             )}
-          />
-          {errors.categories && (
-            <p className='text-red-500 text-sm'>{errors.categories.message}</p>
-          )}
-        </div>
-        <div>
-          <Label>Visibility</Label>
-          <RadioGroup
-            onValueChange={(value: VisibilityType) =>
-              setValue('visibility', value)
-            }
-          >
-            <div className='mt-1.5 flex gap-x-6'>
-              <div className='flex gap-x-1'>
-                <RadioGroupItem value='public' id='public' />
-                <Label htmlFor='public'>Public</Label>
+          </div>
+          <div>
+            <div className='flex items-end gap-x-4'>
+              <div className='w-full'>
+                <Label htmlFor='writer'>
+                  Writer (For multiple writer, separate with comma)
+                </Label>
+                <Input
+                  autoComplete='off'
+                  id='writer'
+                  type='text'
+                  placeholder='Ex: John Doe, Jessica'
+                  {...register('writers')}
+                />
               </div>
-              <div className='flex gap-x-1'>
-                <RadioGroupItem value='private' id='private' />
-                <Label htmlFor='private'>Private</Label>
-              </div>
+              <Button
+                type='button'
+                variant='outline-dark-blue'
+                className='w-[80px]'
+                onClick={onAddWriters}
+              >
+                Add
+              </Button>
             </div>
-          </RadioGroup>
-          {errors.visibility && (
-            <p className='text-red-500 text-sm'>{errors.visibility.message}</p>
-          )}
+            {isWritersEmpty && (
+              <p className='text-red-500 text-sm'>Writer is required!</p>
+            )}
+            <div className='flex gap-3 items-center flex-wrap mt-3'>
+              {writers.map((w, i) => (
+                <Badge variant='blue' key={w}>
+                  {w}
+                  <FaTimes
+                    className='ml-2 cursor-pointer hover:text-red-600 w-3 h-3'
+                    onClick={() => onDeleteWriters(i)}
+                  />
+                </Badge>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
-      {mode === 'edit' && book.isDone && (
-        <div>
-          <Label htmlFor='description'>Description</Label>
-          <Textarea
-            id='description'
-            placeholder='Enter book description (max 500 characters)'
-            {...register('description')}
-          />
-          {errors.description && (
-            <p className='text-red-500 text-sm'>{errors.description.message}</p>
-          )}
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6'>
+          <div>
+            <Label htmlFor='year'>Year</Label>
+            <Input
+              id='year'
+              type='number'
+              placeholder='Enter publication year'
+              {...register('year', {
+                setValueAs: (value) => parseInt(value, 10),
+              })}
+            />
+            {errors.year && (
+              <p className='text-red-500 text-sm'>{errors.year.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor='categories'>Categories</Label>
+            <Controller
+              name='categories'
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  isMulti
+                  options={CATEGORIES_DROPDOWN}
+                  styles={customStyles}
+                  placeholder='Select categories'
+                />
+              )}
+            />
+            {errors.categories && (
+              <p className='text-red-500 text-sm'>
+                {errors.categories.message}
+              </p>
+            )}
+          </div>
+          <div>
+            <Label>Visibility</Label>
+            <RadioGroup
+              onValueChange={(value: VisibilityType) =>
+                setValue('visibility', value)
+              }
+            >
+              <div className='mt-1.5 flex gap-x-6'>
+                <div className='flex gap-x-1'>
+                  <RadioGroupItem value='public' id='public' />
+                  <Label htmlFor='public'>Public</Label>
+                </div>
+                <div className='flex gap-x-1'>
+                  <RadioGroupItem value='private' id='private' />
+                  <Label htmlFor='private'>Private</Label>
+                </div>
+              </div>
+            </RadioGroup>
+            {errors.visibility && (
+              <p className='text-red-500 text-sm'>
+                {errors.visibility.message}
+              </p>
+            )}
+          </div>
         </div>
-      )}
-      <div className='flex justify-between my-20'>
-        <Button
-          type='button'
-          variant='outline-red'
-          onClick={() => router.back()}
-        >
-          Go Back
-        </Button>
-        <Button type='submit' variant={mode === 'add' ? 'blue' : 'yellow'}>
-          {mode === 'add' ? 'Add Book' : 'Edit Book'}
-        </Button>
-      </div>
-    </form>
+        {mode === 'edit' && book.isDone && (
+          <div>
+            <Label htmlFor='description'>Description</Label>
+            <Textarea
+              id='description'
+              placeholder='Enter book description (max 500 characters)'
+              {...register('description')}
+            />
+            {errors.description && (
+              <p className='text-red-500 text-sm'>
+                {errors.description.message}
+              </p>
+            )}
+          </div>
+        )}
+        <div className='flex justify-between my-20'>
+          <Button
+            type='button'
+            variant='outline-red'
+            onClick={() => router.back()}
+          >
+            Go Back
+          </Button>
+          <Button type='submit' variant={mode === 'add' ? 'blue' : 'yellow'}>
+            {mode === 'add' ? 'Add Book' : 'Edit Book'}
+          </Button>
+        </div>
+      </form>
+    </>
   );
 }
 
