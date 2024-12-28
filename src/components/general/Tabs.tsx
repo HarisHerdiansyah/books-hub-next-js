@@ -5,7 +5,7 @@ import Link from 'next/link';
 import clsx from 'clsx';
 import { usePathname, useParams } from 'next/navigation';
 
-const TABS = ['Overview', 'Books', 'Setting'];
+const TABS = ['Overview', 'Books', 'Settings'];
 
 function Tabs() {
   const pathname = usePathname();

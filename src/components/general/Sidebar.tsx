@@ -18,7 +18,7 @@ export default async function Sidebar({ username }: { username: string }) {
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
+      <SheetTrigger className='md:hidden cursor-pointer' asChild>
         <Avatar>
           <AvatarImage src={user?.imageUrl} />
           <AvatarFallback>Prpfile</AvatarFallback>
