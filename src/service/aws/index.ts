@@ -15,7 +15,7 @@ const s3Client = new S3Client({
   },
 });
 
-export async function uploadFile(file: File, name: string, path: string) {
+export async function s3UploadHelper(file: File, name: string, path: string) {
   try {
     if (typeof file !== 'object' || !file || file?.size === 0) {
       return '';

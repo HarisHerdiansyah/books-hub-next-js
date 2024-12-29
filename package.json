@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port=5000",
-    "build": "npx prisma generate && npx next build",
+    "build": "npx tsc --noEmit && npx prisma generate && npx next build",
     "start": "next start",
     "lint": "next lint"
   },

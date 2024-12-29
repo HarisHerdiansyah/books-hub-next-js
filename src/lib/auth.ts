@@ -53,6 +53,11 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, trigger, session }) {
+      if (trigger === 'update') {
+        if (session.username) token.username = session.username;
+        if (session.image) token.image = session.image;
+      }
+
       if (user) {
         token.id = user.id;
         token.image = user.image;
@@ -61,10 +66,6 @@ export const authOptions: AuthOptions = {
         token.fullName = user.fullName;
         token.bio = user.bio;
         token.about = user.about;
-      }
-
-      if (trigger === 'update') {
-        token.username = session.username;
       }
       return token;
     },

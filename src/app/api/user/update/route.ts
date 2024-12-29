@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { NextResponse } from 'next/server';
-import { uploadFile } from '@/service/aws';
+import { s3UploadHelper } from '@/service/aws';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -17,8 +17,6 @@ export async function PATCH(req: Request) {
           select: { username: true },
         })
       )?.username;
-
-      console.log(isUsernameExist);
 
       if (isUsernameExist) {
         return NextResponse.json(
@@ -83,7 +81,7 @@ export async function POST(req: Request) {
     const image = body.photo as File;
     const fileKey = userObj?.id;
 
-    const isUploadSuccess = await uploadFile(
+    const isUploadSuccess = await s3UploadHelper(
       image,
       fileKey as string,
       pathUpload
@@ -93,6 +91,7 @@ export async function POST(req: Request) {
     const fileKeyWithExt = `${fileKey}.${ext}`;
     let imageUrl = '';
     if (isUploadSuccess) {
+      // revalidate cache first
       imageUrl = `${process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_URL}/${pathUpload}/${fileKeyWithExt}`;
     }
 

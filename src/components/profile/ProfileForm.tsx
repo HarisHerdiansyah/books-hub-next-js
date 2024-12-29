@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,7 +11,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { updateUserProfile } from '@/service/user';
 
 const isBrowser = typeof window !== 'undefined' && typeof File !== 'undefined';
@@ -73,13 +73,20 @@ function ProfileForm() {
           Complete your profile!
         </Label>
         <div className='my-4 flex items-center justify-center gap-x-6'>
-          <Avatar className='w-32 h-32'>
-            {photoPreview ? (
-              <AvatarImage src={photoPreview} alt='Profile photo' />
-            ) : (
-              <AvatarFallback>Preview</AvatarFallback>
-            )}
-          </Avatar>
+          {photoPreview ? (
+            <div className='w-[160px] h-[160px] border border-black bg-white rounded-full overflow-hidden flex items-center'>
+              <Image
+                src={photoPreview}
+                alt='Avatar Preview'
+                width={160}
+                height={160}
+              />
+            </div>
+          ) : (
+            <div className='w-36 h-36 rounded-full bg-gray-300 flex items-center justify-center'>
+              <span className='text-gray-600'>No Photo</span>
+            </div>
+          )}
           <Input
             type='file'
             id='photo'

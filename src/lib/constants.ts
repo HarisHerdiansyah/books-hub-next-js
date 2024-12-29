@@ -113,4 +113,14 @@ export const toasterProps = {
       description: msg,
     }),
   },
+  uploadPhoto: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'Profile photo updated',
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed updating photo',
+      description: msg,
+    }),
+  },
 };
