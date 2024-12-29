@@ -7,11 +7,24 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 
+import {
+  CloudFrontClient,
+  CreateInvalidationCommand,
+} from '@aws-sdk/client-cloudfront';
+
 const s3Client = new S3Client({
-  region: process.env.S3_REGION as string,
+  region: process.env.CLOUD_REGION as string,
   credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY as string,
+    accessKeyId: process.env.ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY as string,
+  },
+});
+
+const cloudfrontClient = new CloudFrontClient({
+  region: process.env.CLOUD_REGION as string,
+  credentials: {
+    accessKeyId: process.env.ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.SECRET_ACCESS_KEY as string,
   },
 });
 
@@ -36,6 +49,31 @@ export async function s3UploadHelper(file: File, name: string, path: string) {
     return true;
   } catch (e) {
     console.log('Error upload file', e);
+    return false;
+  }
+}
+
+export async function revalidateCloudFrontCache(
+  path: string,
+  fileKey: string
+) {
+  try {
+    const invalidationParams = {
+      DistributionId: process.env.CLOUDFRONT_DIST_ID,
+      InvalidationBatch: {
+        Paths: {
+          Quantity: 1,
+          Items: [`/${path}/${fileKey}`],
+        },
+        CallerReference: `invalidation-${Date.now()}`,
+      },
+    };
+    const command = new CreateInvalidationCommand(invalidationParams);
+    const response = await cloudfrontClient.send(command);
+    console.log(response);
+    return true;
+  } catch (e) {
+    console.log('Error revalidating cache', e);
     return false;
   }
 }

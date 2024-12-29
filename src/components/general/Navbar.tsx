@@ -8,7 +8,6 @@ import Sidebar from './Sidebar';
 
 async function Navbar() {
   const session = await getServerSession(authOptions);
-  console.log(session?.user);
 
   return (
     <nav className='bg-[#392467] text-white px-4 md:px-8 py-4 flex items-center justify-between'>

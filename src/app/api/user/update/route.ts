@@ -91,7 +91,6 @@ export async function POST(req: Request) {
     const fileKeyWithExt = `${fileKey}.${ext}`;
     let imageUrl = '';
     if (isUploadSuccess) {
-      // revalidate cache first
       imageUrl = `${process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_URL}/${pathUpload}/${fileKeyWithExt}`;
     }
 

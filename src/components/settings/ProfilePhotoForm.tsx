@@ -103,7 +103,7 @@ export default function ProfilePhotoForm({
               />
             </div>
             <Button type='submit' variant='purple' disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save P'}
+              {isSubmitting ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </div>

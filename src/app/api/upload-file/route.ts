@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { NextResponse } from 'next/server';
-import { s3UploadHelper } from '@/service/aws';
+import { revalidateCloudFrontCache, s3UploadHelper } from '@/service/aws';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -9,17 +9,23 @@ export async function POST(req: Request) {
   try {
     const fileData = await req.formData();
     const payload = Object.fromEntries(fileData.entries());
-    const userObj = (await getServerSession(authOptions))?.user;
     const image = payload.photo as File;
+
+    const userObj = (await getServerSession(authOptions))?.user;
     const fileKey = userObj?.id as string;
+    const ext = image.name.split('.').pop();
+    const fileKeyWithExt = `${fileKey}.${ext}`;
     const pathUpload = 'profile';
 
     const isUploadSuccess = await s3UploadHelper(image, fileKey, pathUpload);
+    const isRevalidateSuccess = await revalidateCloudFrontCache(
+      pathUpload,
+      fileKeyWithExt
+    );
 
-    const ext = image.name.split('.').pop();
-    const fileKeyWithExt = `${fileKey}.${ext}`;
     let imageUrl = '';
-    if (isUploadSuccess) {
+    if (isUploadSuccess && isRevalidateSuccess) {
+      console.log('ALL GREAT');
       imageUrl = `${process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_URL}/${pathUpload}/${fileKeyWithExt}`;
     }
 
