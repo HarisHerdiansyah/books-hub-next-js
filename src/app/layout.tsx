@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { AuthSessionProvider } from '@/components/provider';
 import { Toaster } from '@/components/ui/toaster';
+import 'react-image-crop/dist/ReactCrop.css';
 import './globals.css';
 
 const geistSans = localFont({

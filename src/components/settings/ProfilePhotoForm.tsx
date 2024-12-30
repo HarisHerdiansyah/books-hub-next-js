@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useSession } from 'next-auth/react';
+import { FormEvent, useState } from 'react';
+import { AxiosError } from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,14 +11,7 @@ import { useToast } from '@/hooks';
 import Spinner from '@/components/general/Spinner';
 import { uploadFile } from '@/service/upload-file';
 import { toasterProps } from '@/lib/constants';
-import { AxiosError } from 'axios';
-import { useSession } from 'next-auth/react';
-
-const photoSchema = z.object({
-  photo: z.instanceof(FileList).optional(),
-});
-
-type PhotoFormValues = z.infer<typeof photoSchema>;
+import CropPhotoDialog from './CropPhotoDialog';
 
 export default function ProfilePhotoForm({
   initialImageUrl,
@@ -29,50 +21,55 @@ export default function ProfilePhotoForm({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     initialImageUrl
   );
+  const [avatarFile, setAvatarFile] = useState<File | null>();
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const { toast } = useToast();
   const { update } = useSession();
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<PhotoFormValues>({
-    resolver: zodResolver(photoSchema),
-  });
 
-  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
         setAvatarPreview(reader.result as string);
+        setAvatarFile(file);
+        setDialogOpen(true);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const onSubmit = async (data: PhotoFormValues) => {
-    if (data.photo)
-      try {
-        const response = await uploadFile({ photo: data.photo?.[0] as File });
-        update({ image: response.data.data.imageUrl });
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await uploadFile({ photo: avatarFile as File });
+      update({ image: response.data.data.imageUrl });
+      toast({
+        ...toasterProps.uploadPhoto.resolve(),
+        variant: 'success',
+      });
+    } catch (e: unknown) {
+      if (e instanceof AxiosError && 'response' in e) {
         toast({
-          ...toasterProps.uploadPhoto.resolve(),
-          variant: 'success',
+          ...toasterProps.uploadPhoto.reject(e.response?.data.message),
+          variant: 'destructive',
         });
-      } catch (e: unknown) {
-        if (e instanceof AxiosError && 'response' in e) {
-          toast({
-            ...toasterProps.uploadPhoto.reject(e.response?.data.message),
-            variant: 'destructive',
-          });
-        }
       }
+    }
   };
 
   return (
     <>
-      {isSubmitting && <Spinner />}
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+      {false && <Spinner />}
+      <CropPhotoDialog
+        imgSrc={avatarPreview as string}
+        imgFile={avatarFile as File}
+        open={dialogOpen}
+        setImgSrc={setAvatarPreview}
+        setImgFile={setAvatarFile}
+        onClose={() => setDialogOpen(false)}
+      />
+      <form onSubmit={onSubmit} className='space-y-6'>
         <div className='mt-6 flex flex-col sm:flex-row items-center justify-center gap-4'>
           <div className='flex flex-col items-center'>
             <Label className='mb-3'>Profile Photo</Label>
@@ -92,18 +89,10 @@ export default function ProfilePhotoForm({
           </div>
           <div className='flex items-center space-x-2'>
             <div className='max-w-[250px]'>
-              <Input
-                type='file'
-                accept='image/*'
-                {...register('photo')}
-                onChange={(e) => {
-                  register('photo').onChange(e);
-                  handleAvatarChange(e);
-                }}
-              />
+              <Input type='file' accept='image/*' onChange={onAvatarChange} />
             </div>
-            <Button type='submit' variant='purple' disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save'}
+            <Button type='submit' variant='purple'>
+              Save
             </Button>
           </div>
         </div>

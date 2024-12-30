@@ -17,6 +17,7 @@ export async function POST(req: Request) {
     const fileKeyWithExt = `${fileKey}.${ext}`;
     const pathUpload = 'profile';
 
+    console.log(fileKey, fileKeyWithExt);
     const isUploadSuccess = await s3UploadHelper(image, fileKey, pathUpload);
     const isRevalidateSuccess = await revalidateCloudFrontCache(
       pathUpload,
