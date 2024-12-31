@@ -4,13 +4,17 @@ import React from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { usePathname, useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 const TABS = ['Overview', 'Books', 'Settings'];
 
 function Tabs() {
   const pathname = usePathname();
   const params = useParams();
+  const { data } = useSession();
   const { username } = params;
+
+  if (data?.user.username !== username) TABS.pop();
 
   return (
     <div className='flex justify-end border-b border-gray-300'>
