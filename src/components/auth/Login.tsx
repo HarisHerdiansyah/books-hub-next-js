@@ -112,7 +112,7 @@ function LoginForm() {
               href='/forgot-password'
               className='hover:underline text-red-700'
             >
-              <Text tag='p'>Reset Password?</Text>
+              <Text tag='p'>Forgot Password?</Text>
             </Link>
             <Link href='/register' className='hover:underline text-green-800'>
               <Text tag='p'>Register Here</Text>

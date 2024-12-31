@@ -133,4 +133,24 @@ export const toasterProps = {
       description: msg,
     }),
   },
+  emailReset: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'Email has sent',
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed send email',
+      description: msg,
+    }),
+  },
+  resetPassword: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'Password is updated',
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed',
+      description: msg,
+    }),
+  },
 };
