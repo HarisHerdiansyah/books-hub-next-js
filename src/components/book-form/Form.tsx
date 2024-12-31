@@ -46,7 +46,7 @@ const customStyles = {
   control: (base: any, state: any) => ({
     ...base,
     borderRadius: '0.375rem',
-    borderColor: state.isFocused ? 'rgb(59 130 246)' : 'rgb(203 213 225)', // Change on focus
+    borderColor: state.isFocused ? 'rgb(59 130 246)' : 'rgb(203 213 225)',
     boxShadow: state.isFocused ? '0 0 0 3px rgba(59, 130, 246, 0.3)' : 'none',
     '&:hover': {
       borderColor: state.isFocused ? 'rgb(59 130 246)' : 'rgb(203 213 225)',

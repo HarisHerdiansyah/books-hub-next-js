@@ -23,6 +23,7 @@ export default function ProfilePhotoForm({
   );
   const [avatarFile, setAvatarFile] = useState<File | null>();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
   const { update } = useSession();
 
@@ -41,6 +42,7 @@ export default function ProfilePhotoForm({
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await uploadFile({ photo: avatarFile as File });
       update({ image: response.data.data.imageUrl });
@@ -55,12 +57,14 @@ export default function ProfilePhotoForm({
           variant: 'destructive',
         });
       }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
-      {false && <Spinner />}
+      {loading && <Spinner />}
       <CropPhotoDialog
         imgSrc={avatarPreview as string}
         imgFile={avatarFile as File}

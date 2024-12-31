@@ -23,13 +23,23 @@ export const toasterProps = {
       description: msg,
     }),
   },
-  toggleFavourite: {
+  markFavourite: {
     resolve: () => ({
       title: 'Success',
       description: 'Book marked as favourite',
     }),
     reject: (msg: string) => ({
       title: 'Failed mark book as favourite',
+      description: msg,
+    }),
+  },
+  removeFavourite: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'Book removed from favourite',
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed removing book from favourite',
       description: msg,
     }),
   },

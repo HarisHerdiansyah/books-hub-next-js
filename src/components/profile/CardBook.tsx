@@ -97,9 +97,10 @@ export default function CardBook({
   const { execute, loading } = useAsyncToast();
 
   const onUpdateFavourite = () => {
+    const { markFavourite, removeFavourite } = toasterProps;
     execute(
       async () => await updateFavourite(bookId, !isFav),
-      toasterProps.toggleFavourite
+      !isFav ? markFavourite : removeFavourite
     );
   };
 
