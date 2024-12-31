@@ -32,6 +32,7 @@ export default async function Page({
   const { username } = await params;
   const dataBooks = await getDataBooks(session, username);
   const pinnedBooks = dataBooks.filter((book: Book) => book.isPin);
+  const showControl = username === session?.user.username;
 
   return (
     <div className='flex py-5 gap-x-6'>
@@ -52,7 +53,7 @@ export default async function Page({
         {pinnedBooks.length > 0 ? (
           <div className='w-full grid grid-cols-1 xl:grid-cols-2 gap-4'>
             {pinnedBooks.map((book) => (
-              <CardBook key={book.bookId} {...book} />
+              <CardBook key={book.bookId} {...book} showControl={showControl} />
             ))}
           </div>
         ) : (

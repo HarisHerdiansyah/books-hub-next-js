@@ -33,6 +33,7 @@ type CardBookProps = {
   isDone: boolean;
   isFav: boolean;
   username: string;
+  showControl: boolean;
 };
 
 function VisibilityBadge({
@@ -93,6 +94,7 @@ export default function CardBook({
   isDone,
   isFav,
   username,
+  showControl,
 }: CardBookProps) {
   const { execute, loading } = useAsyncToast();
 
@@ -130,14 +132,20 @@ export default function CardBook({
   }
 
   return (
-    <Card className='w-full min-h-[180px] overflow-hidden flex flex-col justify-between border-zinc-300'>
+    <Card
+      className={clsx('w-full overflow-hidden flex flex-col border-zinc-300', {
+        'justify-between min-h-[180px]': showControl,
+      })}
+    >
       <CardHeader className='justify-between flex-row'>
         <div className='flex items-center sm:space-x-2'>
-          <FavouriteBtn
-            isFav={isFav}
-            action={onUpdateFavourite}
-            screen='wide'
-          />
+          {showControl && (
+            <FavouriteBtn
+              isFav={isFav}
+              action={onUpdateFavourite}
+              screen='wide'
+            />
+          )}
           <Link
             href={`/${username}/detail-book/${bookId}`}
             className='hover:underline'
@@ -147,12 +155,16 @@ export default function CardBook({
             </Text>
           </Link>
         </div>
-        <VisibilityBadge visibility={visibility} screen='wide' />
-        <ActionPopover
-          bookId={bookId}
-          deleteAction={onDeleteBook}
-          markDoneAction={onMarkBookDone}
-        />
+        {showControl && (
+          <>
+            <VisibilityBadge visibility={visibility} screen='wide' />
+            <ActionPopover
+              bookId={bookId}
+              deleteAction={onDeleteBook}
+              markDoneAction={onMarkBookDone}
+            />
+          </>
+        )}
       </CardHeader>
       <CardContent>
         <Text tag='p' className='line-clamp-2'>
@@ -162,37 +174,39 @@ export default function CardBook({
           Writers: {writers.join(', ')}
         </Text>
       </CardContent>
-      <CardFooter className='justify-between'>
-        <div>
-          <Badge
-            variant={isDone ? 'green' : 'orange'}
-            className='font-bold uppercase'
-          >
-            {isDone ? 'Finished' : 'Unfinished'}
-          </Badge>
-          <VisibilityBadge visibility={visibility} screen='mobile' />
-        </div>
-        <FavouriteBtn
-          isFav={isFav}
-          action={onUpdateFavourite}
-          screen='mobile'
-        />
-        <div className='hidden sm:flex gap-x-2'>
-          <Button size='icon' variant='red' onClick={onDeleteBook}>
-            <FaTrashAlt />
-          </Button>
-          <Link href={`/book-form?mode=edit&bookId=${bookId}`}>
-            <Button size='icon' variant='yellow'>
-              <FaPen />
+      {showControl && (
+        <CardFooter className='justify-between'>
+          <div>
+            <Badge
+              variant={isDone ? 'green' : 'orange'}
+              className='font-bold uppercase'
+            >
+              {isDone ? 'Finished' : 'Unfinished'}
+            </Badge>
+            <VisibilityBadge visibility={visibility} screen='mobile' />
+          </div>
+          <FavouriteBtn
+            isFav={isFav}
+            action={onUpdateFavourite}
+            screen='mobile'
+          />
+          <div className='hidden sm:flex gap-x-2'>
+            <Button size='icon' variant='red' onClick={onDeleteBook}>
+              <FaTrashAlt />
             </Button>
-          </Link>
-          {!isDone && (
-            <Button size='icon' variant='green' onClick={onMarkBookDone}>
-              <FaCheck />
-            </Button>
-          )}
-        </div>
-      </CardFooter>
+            <Link href={`/book-form?mode=edit&bookId=${bookId}`}>
+              <Button size='icon' variant='yellow'>
+                <FaPen />
+              </Button>
+            </Link>
+            {!isDone && (
+              <Button size='icon' variant='green' onClick={onMarkBookDone}>
+                <FaCheck />
+              </Button>
+            )}
+          </div>
+        </CardFooter>
+      )}
     </Card>
   );
 }

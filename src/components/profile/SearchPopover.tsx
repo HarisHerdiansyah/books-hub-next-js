@@ -28,7 +28,7 @@ export default function SearchPopover() {
   });
 
   const onSelect = (value: string) => {
-    setSearch((prev) => ({ ...prev, key: value }));
+    setSearch((prev) => ({ ...prev, key: value, value: '' }));
   };
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

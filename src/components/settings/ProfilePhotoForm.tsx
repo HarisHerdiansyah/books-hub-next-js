@@ -12,6 +12,7 @@ import Spinner from '@/components/general/Spinner';
 import { uploadFile } from '@/service/upload-file';
 import { toasterProps } from '@/lib/constants';
 import CropPhotoDialog from './CropPhotoDialog';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePhotoForm({
   initialImageUrl,
@@ -25,7 +26,8 @@ export default function ProfilePhotoForm({
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const { toast } = useToast();
-  const { update } = useSession();
+  const { update, data: userData } = useSession();
+  const { replace } = useRouter();
 
   const onAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -50,6 +52,7 @@ export default function ProfilePhotoForm({
         ...toasterProps.uploadPhoto.resolve(),
         variant: 'success',
       });
+      replace(`/${userData?.user.username}/overview`);
     } catch (e: unknown) {
       if (e instanceof AxiosError && 'response' in e) {
         toast({
@@ -81,12 +84,12 @@ export default function ProfilePhotoForm({
               <Image
                 src={avatarPreview}
                 alt='Avatar Preview'
-                width={150}
-                height={150}
+                width={160}
+                height={160}
                 className='rounded-full'
               />
             ) : (
-              <div className='w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center'>
+              <div className='w-36 h-36 rounded-full bg-gray-300 flex items-center justify-center'>
                 <span className='text-gray-600'>No Photo</span>
               </div>
             )}

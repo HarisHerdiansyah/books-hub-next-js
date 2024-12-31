@@ -42,7 +42,7 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
   const { about, bio, imageUrl, username, firstName, lastName } =
     userProps as UserFormProps;
 
-  const { update } = useSession();
+  const { update, data: userData } = useSession();
   const { replace } = useRouter();
   const { toast } = useToast();
   const {
@@ -71,8 +71,12 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
     });
     try {
       await editUserProfile(payload);
-      await update({ username: payload.username });
-      replace(`/${payload.username}/overview`);
+      if (payload.username) {
+        await update({ username: payload.username });
+        replace(`/${payload.username}/overview`);
+      } else {
+        replace(`/${userData?.user.username}/overview`);
+      }
       toast({ ...toasterProps.editProfile.resolve(), variant: 'success' });
     } catch (e: unknown) {
       if (e instanceof AxiosError && e.response) {
