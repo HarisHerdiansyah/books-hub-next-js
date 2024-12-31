@@ -91,7 +91,7 @@ export async function POST(req: Request) {
     const fileKeyWithExt = `${fileKey}.${ext}`;
     let imageUrl = '';
     if (isUploadSuccess) {
-      imageUrl = `${process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_URL}/${pathUpload}/${fileKeyWithExt}`;
+      imageUrl = `${process.env.CLOUDFRONT}/${pathUpload}/${fileKeyWithExt}`;
     }
 
     await db.$transaction(async (tx) => {

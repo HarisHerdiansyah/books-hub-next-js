@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     let imageUrl = '';
     if (isUploadSuccess && isRevalidateSuccess) {
       console.log('ALL GREAT');
-      imageUrl = `${process.env.NEXT_PUBLIC_AWS_CLOUDFRONT_URL}/${pathUpload}/${fileKeyWithExt}`;
+      imageUrl = `${process.env.CLOUDFRONT}/${pathUpload}/${fileKeyWithExt}`;
     }
 
     await db.$transaction(async (tx) => {

@@ -51,7 +51,6 @@ model Books {
   createdAt    DateTime     @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime     @default(now()) @updatedAt @db.Timestamptz(3)
   bookDetail   BookDetail?
-  pinnedBooks  PinnedBooks?
 }
 
 model BookDetail {
@@ -61,7 +60,3 @@ model BookDetail {
   description String
 }
 
-model PinnedBooks {
-  books  Books  @relation(fields: [bookId], references: [bookId])
-  bookId String @id
-}
