@@ -11,7 +11,9 @@
     "migrate:prod": "dotenv -e .env.production -- npx prisma migrate deploy",
     "build": "npx tsc --noEmit && npx prisma generate && npx next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed:local": "dotenv -e .env.local -- prisma db seed",
+    "seed:dev": "dotenv -e .env.development -- prisma db seed"
   },
   "prisma": {
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
@@ -38,6 +40,7 @@
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^16.4.7",
     "dotenv-cli": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.462.0",
