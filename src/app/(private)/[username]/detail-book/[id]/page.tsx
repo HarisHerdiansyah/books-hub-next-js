@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import { Text } from '@/components/typography';
 import { db } from '@/lib/db';
-import Link from 'next/link';
 
 export default async function Page({
   params,
@@ -8,6 +8,7 @@ export default async function Page({
   params: Promise<{ username: string; id: string }>;
 }) {
   const { username, id } = await params;
+
   const book = await db.books.findUnique({
     where: {
       bookId: id,
@@ -26,6 +27,11 @@ export default async function Page({
       },
     },
   });
+
+  await db.books.update({
+    where: { bookId: id },
+    data: { views: (book?.views as number) + 1 }
+  })
 
   return (
     <>
@@ -61,12 +67,6 @@ export default async function Page({
         <Text tag='h4'>Year:</Text>
         <Text tag='p' className='text-xl'>
           {book?.year}
-        </Text>
-      </div>
-      <div className='flex items-center space-x-2 my-1'>
-        <Text tag='h4'>Views:</Text>
-        <Text tag='p' className='text-xl'>
-          {book?.views}
         </Text>
       </div>
       <div className='flex items-center space-x-2 my-1'>

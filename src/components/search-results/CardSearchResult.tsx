@@ -1,6 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { FaEye, FaUser } from 'react-icons/fa';
+import { DateTime } from 'luxon';
+import numbro from 'numbro';
 import {
   Card,
   CardHeader,
@@ -8,7 +11,6 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { FaEye, FaUser } from 'react-icons/fa';
 import { Text } from '../typography';
 
 type CardBookProps = {
@@ -20,6 +22,7 @@ type CardBookProps = {
   writers: string[];
   username: string;
   userImageUrl: string;
+  updatedAt: Date;
 };
 
 export default function CardSearchResult({
@@ -30,7 +33,13 @@ export default function CardSearchResult({
   writers,
   username,
   userImageUrl,
+  updatedAt,
 }: CardBookProps) {
+  const formattedViews =
+    views > 999
+      ? numbro(views).format({ average: true, mantissa: 1 }).toUpperCase()
+      : views;
+
   return (
     <Card className='w-full overflow-hidden'>
       <CardHeader className='flex-row space-x-2'>
@@ -63,10 +72,12 @@ export default function CardSearchResult({
         <div className='flex items-center space-x-2'>
           <FaEye size={22} />
           <Text tag='p' className='font-semibold'>
-            {views} view(s)
+            {formattedViews} view(s)
           </Text>
         </div>
-        <Text tag='p'>Updated 2 years ago</Text>
+        <Text tag='p'>
+          Updated {DateTime.fromJSDate(updatedAt).toRelativeCalendar()}
+        </Text>
       </CardFooter>
     </Card>
   );
