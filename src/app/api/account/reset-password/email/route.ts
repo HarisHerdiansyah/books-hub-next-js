@@ -56,6 +56,7 @@ export async function POST(req: Request) {
       {
         success: false,
         message: 'Error in sending email',
+        error: e,
       },
       { status: 500 }
     );
