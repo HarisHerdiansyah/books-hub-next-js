@@ -15,11 +15,7 @@ export async function register(payload: Credentials) {
 export async function sendEmailResetPassword(
   payload: Omit<Credentials, 'password'>
 ) {
-  try {
-    await api.post('/api/account/reset-password/email', payload);
-  } catch (e) {
-    axiosErrorLogger(e);
-  }
+  await api.post('/api/account/reset-password/email', payload);
 }
 
 export async function resetPassword(

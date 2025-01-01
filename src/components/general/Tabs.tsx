@@ -6,15 +6,15 @@ import clsx from 'clsx';
 import { usePathname, useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
-const TABS = ['Overview', 'Books', 'Settings'];
+const guestTabs = ['Overview', 'Books'];
+const userTabs = [...guestTabs, 'Settings'];
 
 function Tabs() {
   const pathname = usePathname();
   const params = useParams();
   const { data } = useSession();
   const { username } = params;
-
-  if (data?.user.username !== username) TABS.pop();
+  const TABS = data?.user.username === username ? userTabs : guestTabs;
 
   return (
     <div className='flex justify-end border-b border-gray-300'>
