@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       }
     );
 
-    const mailtrapToken = '1ec51c99967b3c6a05932aeaaf163c98';
+    const mailtrapToken = process.env.MAILTRAP_TOKEN as string;
     const client = new MailtrapClient({
       token: mailtrapToken,
     });
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     await client.send({
       from: sender,
       to: recipients,
-      template_uuid: '72652bd0-bd6c-4865-bc24-6327afbc7633',
+      template_uuid: process.env.MAILTRAP_TEMPLATE as string,
       template_variables: {
         name: username,
         reset_link: `${process.env.BASE_URL}/reset-password?token=${token}`,
