@@ -42,15 +42,18 @@ export async function POST(req: Request) {
 
     const recipients = [{ email }];
 
-    await client.send({
-      from: sender,
-      to: recipients,
-      template_uuid: process.env.MAILTRAP_TEMPLATE as string,
-      template_variables: {
-        name: username,
-        reset_link: `${process.env.BASE_URL}/reset-password?token=${token}`,
-      },
-    });
+    client
+      .send({
+        from: sender,
+        to: recipients,
+        template_uuid: process.env.MAILTRAP_TEMPLATE as string,
+        template_variables: {
+          name: username,
+          reset_link: `${process.env.BASE_URL}/reset-password?token=${token}`,
+        },
+      })
+      .then((response) => console.log(response))
+      .catch((error) => console.error(error));
 
     return NextResponse.json(
       {
