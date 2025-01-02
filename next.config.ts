@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
     EMAILJS_PUBLIC_KEY: process.env.EMAILJS_PUBLIC_KEY,
     EMAILJS_PRIVATE_KEY: process.env.EMAILJS_PRIVATE_KEY,
     CLOUDFRONT: process.env.CLOUDFRONT,
+    MAILTRAP_TOKEN: process.env.MAILTRAP_TOKEN,
+    MAILTRAP_TEMPLATE: process.env.MAILTRAP_TEMPLATE,
   },
   images: {
     remotePatterns: [
