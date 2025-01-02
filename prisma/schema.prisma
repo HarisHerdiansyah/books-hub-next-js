@@ -1,6 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearchPostgres", "relationJoins"]
+  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
@@ -47,8 +48,9 @@ model Books {
   views        Int          @default(0)
   categories   String[]     @default([])
   visibility   Boolean      @default(true)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @default(now()) @updatedAt @db.Timestamptz(3)
   bookDetail   BookDetail?
-  pinnedBooks  PinnedBooks?
 }
 
 model BookDetail {
@@ -58,7 +60,3 @@ model BookDetail {
   description String
 }
 
-model PinnedBooks {
-  books  Books  @relation(fields: [bookId], references: [bookId])
-  bookId String @id
-}

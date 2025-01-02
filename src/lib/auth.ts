@@ -6,7 +6,7 @@ import { db } from './db';
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(db),
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
   },
@@ -29,10 +29,10 @@ export const authOptions: AuthOptions = {
         });
         if (!userAccount) return null;
 
-        const isValid =
-          process.env.MODE === 'development'
-            ? cred.password === '12345678'
-            : await bcrypt.compare(cred.password, userAccount.password);
+        const isValid = await bcrypt.compare(
+          cred.password,
+          userAccount.password
+        );
         if (!isValid) return null;
 
         const userData = await db.users.findUnique({
@@ -52,7 +52,12 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === 'update') {
+        if (session.username) token.username = session.username;
+        if (session.image) token.image = session.image;
+      }
+
       if (user) {
         token.id = user.id;
         token.image = user.image;

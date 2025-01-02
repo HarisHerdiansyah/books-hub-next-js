@@ -40,6 +40,7 @@ async function getResults(page: number, filter: Filter) {
       writers: true,
       username: true,
       userImageUrl: true,
+      updatedAt: true,
     },
   });
   return {

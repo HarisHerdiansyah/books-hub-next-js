@@ -3,6 +3,7 @@ import { CardProfile, CardBook, PinBooksPopover } from '@/components/profile';
 import { Text } from '@/components/typography';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { Book } from '@/lib/types';
 
 async function getDataBooks(session: Session | null, username: string) {
   const q: { username: string; visibility?: boolean; isDone?: boolean } = {
@@ -30,7 +31,8 @@ export default async function Page({
   const session = await getServerSession(authOptions);
   const { username } = await params;
   const dataBooks = await getDataBooks(session, username);
-  const pinnedBooks = dataBooks.filter((book) => book.isPin);
+  const pinnedBooks = dataBooks.filter((book: Book) => book.isPin);
+  const showControl = username === session?.user.username;
 
   return (
     <div className='flex py-5 gap-x-6'>
@@ -51,7 +53,7 @@ export default async function Page({
         {pinnedBooks.length > 0 ? (
           <div className='w-full grid grid-cols-1 xl:grid-cols-2 gap-4'>
             {pinnedBooks.map((book) => (
-              <CardBook key={book.bookId} {...book} />
+              <CardBook key={book.bookId} {...book} showControl={showControl} />
             ))}
           </div>
         ) : (

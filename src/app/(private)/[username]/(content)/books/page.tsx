@@ -6,11 +6,7 @@ import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { filterQueryBuilder } from '@/lib/utils';
 import { Book } from '@/lib/types';
-import {
-  CardBook,
-  FilterPopover,
-  SearchPopover,
-} from '@/components/profile';
+import { CardBook, FilterPopover, SearchPopover } from '@/components/profile';
 import { Text } from '@/components/typography';
 import { Pagination } from '@/components/general';
 import { ListLoader } from '@/components/profile';
@@ -22,7 +18,7 @@ type Filter = {
   public?: string;
   title?: string;
   writers?: string;
-}; 
+};
 
 async function getAllBooks(
   username: string,
@@ -79,6 +75,7 @@ export default async function Page({
     parseInt(page),
     filter as Filter
   );
+  const showControl = username === session?.user.username;
 
   return (
     <div className='flex py-5 gap-x-6'>
@@ -114,7 +111,11 @@ export default async function Page({
           <div className='w-full grid grid-cols-1 lg:grid-cols-2 gap-4'>
             <Suspense fallback={<ListLoader />}>
               {dataBooks.data.map((book) => (
-                <CardBook key={book.bookId} {...book} />
+                <CardBook
+                  key={book.bookId}
+                  {...book}
+                  showControl={showControl}
+                />
               ))}
             </Suspense>
           </div>

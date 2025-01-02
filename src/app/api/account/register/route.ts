@@ -52,6 +52,7 @@ export async function POST(req: Request) {
       {
         success: false,
         message: 'Error registering user',
+        error: e,
       },
       { status: 500 }
     );

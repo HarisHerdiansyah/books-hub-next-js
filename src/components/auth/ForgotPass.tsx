@@ -1,27 +1,29 @@
 'use client';
 
 import Link from 'next/link';
-import { Text } from '../typography';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Text } from '@/components/typography';
+import { useAsyncToast } from '@/hooks';
+import { sendEmailResetPassword } from '@/service/account';
+import { toasterProps } from '@/lib/constants';
+import Spinner from '@/components/general/Spinner';
 
-const forgotPasswordSchema = z
-  .object({
-    email: z.string().email('Please enter a valid email address.'),
-    newPassword: z.string().min(8, 'Password must be at least 8 characters.'),
-    confirmPassword: z
-      .string()
-      .min(8, 'Confirm password must be at least 8 characters.'),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Passwords must match',
-  });
+const forgotPasswordSchema = z.object({
+  username: z.string().min(1, 'Username is required.'),
+  email: z.string().email('Please enter a valid email address.'),
+});
 
 type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
@@ -33,23 +35,46 @@ function ForgotPasswordForm() {
   } = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
   });
+  const { execute, loading } = useAsyncToast();
 
   const onSubmit = (data: ForgotPasswordFormValues) => {
-    /* eslint-disable no-console */
-    console.log('Reset Password Data:', data);
+    execute(
+      async () => await sendEmailResetPassword(data),
+      toasterProps.emailReset
+    );
   };
 
   return (
     <div className='flex items-center justify-center min-h-screen bg-gray-100 px-2'>
+      {loading && <Spinner />}
       <Card className='w-full max-w-md'>
-        <CardHeader>
-          <CardTitle className='text-center'>Reset Password</CardTitle>
+        <CardHeader className='text-center'>
+          <CardTitle>Forgot Password?</CardTitle>
+          <CardDescription className='text-zinc-800'>
+            Send reset link through the email
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
             <div className='flex flex-col space-y-2'>
+              <Label htmlFor='username'>Username</Label>
+              <Input
+                autoComplete='off'
+                id='username'
+                type='text'
+                placeholder='Enter your username'
+                {...register('username')}
+              />
+              {errors.username && (
+                <p className='text-red-500 text-sm'>
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
+            <div className='flex flex-col space-y-2'>
               <Label htmlFor='email'>Email</Label>
               <Input
+                autoComplete='off'
                 id='email'
                 type='email'
                 placeholder='Enter your email'
@@ -59,41 +84,13 @@ function ForgotPasswordForm() {
                 <p className='text-red-500 text-sm'>{errors.email.message}</p>
               )}
             </div>
-            <div className='flex flex-col space-y-2'>
-              <Label htmlFor='newPassword'>New Password</Label>
-              <Input
-                id='newPassword'
-                type='password'
-                placeholder='Enter your new password'
-                {...register('newPassword')}
-              />
-              {errors.newPassword && (
-                <p className='text-red-500 text-sm'>
-                  {errors.newPassword.message}
-                </p>
-              )}
-            </div>
-            <div className='flex flex-col space-y-2'>
-              <Label htmlFor='confirmPassword'>Confirm Password</Label>
-              <Input
-                id='confirmPassword'
-                type='password'
-                placeholder='Re-enter your new password'
-                {...register('confirmPassword')}
-              />
-              {errors.confirmPassword && (
-                <p className='text-red-500 text-sm'>
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
             <Button
               type='submit'
-              variant='red'
+              variant='destructive'
               className='w-full'
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Processing...' : 'Reset Password'}
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>
           </form>
           <div className='mt-8 flex justify-between items-center'>

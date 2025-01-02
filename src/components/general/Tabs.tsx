@@ -4,13 +4,17 @@ import React from 'react';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { usePathname, useParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
-const TABS = ['Overview', 'Books', 'Setting'];
+const guestTabs = ['Overview', 'Books'];
+const userTabs = [...guestTabs, 'Settings'];
 
 function Tabs() {
   const pathname = usePathname();
   const params = useParams();
+  const { data } = useSession();
   const { username } = params;
+  const TABS = data?.user.username === username ? userTabs : guestTabs;
 
   return (
     <div className='flex justify-end border-b border-gray-300'>

@@ -13,6 +13,7 @@ async function CardProfile({ username }: { username: string }) {
           alt='Profile'
           width={200}
           height={200}
+          priority
         />
       </div>
       <div className='w-full'>
