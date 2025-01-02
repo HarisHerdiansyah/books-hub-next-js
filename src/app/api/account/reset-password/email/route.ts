@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { NextResponse } from 'next/server';
-import emailjs from '@emailjs/nodejs';
+import { MailtrapClient } from 'mailtrap';
 import jwt from 'jsonwebtoken';
 import { db } from '@/lib/db';
 
@@ -30,19 +30,28 @@ export async function POST(req: Request) {
       }
     );
 
-    await emailjs.send(
-      process.env.EMAILJS_SERVICE_ID as string,
-      process.env.EMAILJS_TEMPLATE_ID as string,
-      {
+    const mailtrapToken = '1ec51c99967b3c6a05932aeaaf163c98';
+    const client = new MailtrapClient({
+      token: mailtrapToken,
+    });
+
+    const sender = {
+      email: 'books-hub@books-hub.my.id',
+      name: 'Books Hub',
+    };
+
+    const recipients = [{ email }];
+
+    await client.send({
+      from: sender,
+      to: recipients,
+      template_uuid: '72652bd0-bd6c-4865-bc24-6327afbc7633',
+      template_variables: {
         name: username,
         reset_link: `${process.env.BASE_URL}/reset-password?token=${token}`,
-        email_receiver: email,
       },
-      {
-        publicKey: process.env.EMAILJS_PUBLIC_KEY,
-        privateKey: process.env.EMAILJS_PRIVATE_KEY,
-      }
-    );
+    });
+
     return NextResponse.json(
       {
         success: true,
