@@ -12,6 +12,7 @@ export type Book = {
   visibility: boolean;
   username: string;
   userImageUrl: string;
+  updatedAt: Date;
 };
 
 export type BookDetail = Book & {

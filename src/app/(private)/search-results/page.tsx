@@ -42,6 +42,7 @@ async function getResults(page: number, filter: Filter) {
       userImageUrl: true,
       updatedAt: true,
     },
+    orderBy: { title: 'asc' }
   });
   return {
     data: dataBooks,

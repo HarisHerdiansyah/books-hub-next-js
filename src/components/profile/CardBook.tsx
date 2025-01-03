@@ -1,23 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  FaTrashAlt,
-  FaPen,
-  FaCheck,
-  FaSpinner,
-  FaStar,
-  FaRegStar,
-} from 'react-icons/fa';
+import { FaSpinner, FaEye } from 'react-icons/fa';
 import clsx from 'clsx';
+import { DateTime } from 'luxon';
+import numbro from 'numbro';
 import {
   Card,
   CardHeader,
   CardContent,
   CardFooter,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import {
+  VisibilityBadge,
+  FavouriteBtn,
+  MutationControl,
+} from '@/components/profile';
 import { Text } from '../typography';
 import ActionPopover from './ActionPopover';
 import { useAsyncToast } from '@/hooks';
@@ -34,56 +32,9 @@ type CardBookProps = {
   isFav: boolean;
   username: string;
   showControl: boolean;
+  views: number;
+  updatedAt: Date;
 };
-
-function VisibilityBadge({
-  visibility,
-  screen,
-}: {
-  visibility: boolean;
-  screen: 'mobile' | 'wide';
-}) {
-  return (
-    <Badge
-      variant={visibility ? 'blue' : 'gray'}
-      className={clsx('font-bold uppercase', {
-        'hidden sm:block': screen === 'wide',
-        'sm:hidden': screen === 'mobile',
-      })}
-    >
-      {visibility ? 'Public' : 'Private'}
-    </Badge>
-  );
-}
-
-function FavouriteBtn({
-  isFav,
-  action,
-  screen,
-}: {
-  isFav: boolean;
-  action: () => void;
-  screen: 'mobile' | 'wide';
-}) {
-  return (
-    <div
-      className={clsx(
-        'hover:bg-slate-100 p-1 rounded-lg transition-all duration-300',
-        {
-          'hidden sm:block': screen === 'wide',
-          'sm:hidden': screen === 'mobile',
-        }
-      )}
-      onClick={action}
-    >
-      {isFav ? (
-        <FaStar size={22} color='#EBEB05' className='cursor-pointer' />
-      ) : (
-        <FaRegStar size={22} color='#EBEB05' className='cursor-pointer' />
-      )}
-    </div>
-  );
-}
 
 export default function CardBook({
   bookId,
@@ -95,7 +46,14 @@ export default function CardBook({
   isFav,
   username,
   showControl,
+  views,
+  updatedAt,
 }: CardBookProps) {
+  const formattedViews =
+    views > 999
+      ? numbro(views).format({ average: true, mantissa: 1 }).toUpperCase()
+      : views;
+
   const { execute, loading } = useAsyncToast();
 
   const onUpdateFavourite = () => {
@@ -174,39 +132,32 @@ export default function CardBook({
           Writers: {writers.join(', ')}
         </Text>
       </CardContent>
-      {showControl && (
-        <CardFooter className='justify-between'>
-          <div>
-            <Badge
-              variant={isDone ? 'green' : 'orange'}
-              className='font-bold uppercase'
-            >
-              {isDone ? 'Finished' : 'Unfinished'}
-            </Badge>
-            <VisibilityBadge visibility={visibility} screen='mobile' />
-          </div>
-          <FavouriteBtn
+
+      <CardFooter className='justify-between'>
+        {showControl ? (
+          <MutationControl
+            isDone={isDone}
             isFav={isFav}
-            action={onUpdateFavourite}
-            screen='mobile'
+            visibility={visibility}
+            bookId={bookId}
+            onDeleteBook={onDeleteBook}
+            onMarkBookDone={onMarkBookDone}
+            onUpdateFavourite={onUpdateFavourite}
           />
-          <div className='hidden sm:flex gap-x-2'>
-            <Button size='icon' variant='red' onClick={onDeleteBook}>
-              <FaTrashAlt />
-            </Button>
-            <Link href={`/book-form?mode=edit&bookId=${bookId}`}>
-              <Button size='icon' variant='yellow'>
-                <FaPen />
-              </Button>
-            </Link>
-            {!isDone && (
-              <Button size='icon' variant='green' onClick={onMarkBookDone}>
-                <FaCheck />
-              </Button>
-            )}
-          </div>
-        </CardFooter>
-      )}
+        ) : (
+          <>
+            <div className='flex items-center space-x-2'>
+              <FaEye size={22} />
+              <Text tag='p' className='font-semibold'>
+                {formattedViews} view(s)
+              </Text>
+            </div>
+            <Text tag='p'>
+              Updated {DateTime.fromJSDate(updatedAt).toRelativeCalendar()}
+            </Text>
+          </>
+        )}
+      </CardFooter>
     </Card>
   );
 }

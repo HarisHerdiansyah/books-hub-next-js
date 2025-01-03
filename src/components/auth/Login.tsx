@@ -58,12 +58,9 @@ function LoginForm() {
     return;
   };
 
-  if (isSubmitting) {
-    return <Spinner />;
-  }
-
   return (
     <div className='flex items-center justify-center min-h-screen bg-gray-100 px-2'>
+      {isSubmitting && <Spinner />}
       <Card className='w-full max-w-md'>
         <CardHeader>
           <CardTitle className='text-center'>Books Hub Login</CardTitle>

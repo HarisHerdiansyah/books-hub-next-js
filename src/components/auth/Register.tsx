@@ -47,12 +47,9 @@ function RegisterForm() {
     execute(async () => await userRegister(data), toasterProps.register);
   };
 
-  if (loading) {
-    return <Spinner />;
-  }
-
   return (
     <div className='flex items-center justify-center min-h-screen bg-gray-100 px-2'>
+      {loading && <Spinner />}
       <Card className='w-full max-w-md'>
         <CardHeader>
           <CardTitle className='text-center'>Books Hub Register</CardTitle>

@@ -15,14 +15,13 @@ export default function SignOutBtn() {
     );
   };
 
-  if (loading) {
-    return <Spinner />;
-  }
-
   return (
-    <Button variant='white' onClick={onSignOut}>
-      Logout
-      <FaSignOutAlt />
-    </Button>
+    <>
+      {loading && <Spinner />}
+      <Button variant='white' onClick={onSignOut}>
+        Logout
+        <FaSignOutAlt />
+      </Button>
+    </>
   );
 }

@@ -12,9 +12,12 @@ export default async function Page({
   const search = await searchParams;
 
   try {
-    await api.post('/api/account/reset-password/verify', {
+    const response = await api.post('/api/account/reset-password/verify', {
       token: search?.token,
     });
+    // eslint-disable-next-line no-console
+    console.log(response);
+    return <ResetPassForm />;
   } catch (e) {
     if (e instanceof AxiosError && 'response' in e) {
       return (
@@ -27,6 +30,4 @@ export default async function Page({
       );
     }
   }
-
-  return <ResetPassForm />;
 }
