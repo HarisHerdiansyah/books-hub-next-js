@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
     CLOUDFRONT: process.env.CLOUDFRONT,
     MAILTRAP_TOKEN: process.env.MAILTRAP_TOKEN,
     MAILTRAP_TEMPLATE: process.env.MAILTRAP_TEMPLATE,
+    SECRET_TOKEN: process.env.SECRET_TOKEN,
   },
   images: {
     remotePatterns: [
