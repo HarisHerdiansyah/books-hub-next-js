@@ -1,9 +1,14 @@
 export const CATEGORIES = [
-  'Novel & Comic',
-  'Mathematics & Science',
-  'History & Culture',
+  'Fiction',
+  'Novel',
+  'Biography & Memoir',
+  'Religion',
+  'History',
+  'Culture',
   'Poltics and Government',
+  'Natural Science',
   'Engineering',
+  'Information Technology',
   'Psychology & Self Development',
 ];
 
