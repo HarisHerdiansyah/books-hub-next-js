@@ -23,7 +23,8 @@ type Filter = {
 async function getAllBooks(
   username: string,
   page: number,
-  filter: Filter
+  filter: Filter,
+  isGuest: boolean
 ): Promise<{ data: Book[]; total: number }> {
   const OFFSET = 8;
   const session = await getServerSession(authOptions);
@@ -43,8 +44,13 @@ async function getAllBooks(
       title: 'asc',
     },
   });
+
+  const guestDataBooks = dataBooks.filter((book) => {
+    return book.isDone && book.visibility;
+  });
+
   return {
-    data: dataBooks,
+    data: isGuest ? guestDataBooks : dataBooks,
     total: totalBooks,
   };
 }
@@ -70,10 +76,12 @@ export default async function Page({
   const isQueryExist = searchKeys.includes('page') && searchKeys.length === 1;
   const { username } = segment;
   const { page, ...filter } = search;
+  const isGuest = session?.user.username !== username;
   const dataBooks = await getAllBooks(
     username,
     parseInt(page),
-    filter as Filter
+    filter as Filter,
+    isGuest
   );
   const showControl = username === session?.user.username;
 
@@ -97,7 +105,7 @@ export default async function Page({
           </div>
           <div className='flex items-center gap-x-3'>
             <SearchPopover />
-            <FilterPopover />
+            {!isGuest && <FilterPopover />}
             {!isQueryExist && (
               <Button variant='destructive'>
                 <Link href={`/${username}/books?page=1`} replace>

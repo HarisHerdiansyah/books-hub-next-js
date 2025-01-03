@@ -6,3 +6,7 @@ export { default as SearchPopover } from './SearchPopover';
 export { default as PinBooksPopover } from './PinBooksPopover';
 export { default as ListLoader } from './ListLoader';
 export { default as ActionPopover } from './ActionPopover';
+export { default as VisibilityBadge } from './VisibilityBadge';
+export { default as FavouriteBtn } from './FavouriteBtn';
+export { default as MutationControl } from './MutationControl';
+export { default as DoneBadge } from './DoneBadge';
