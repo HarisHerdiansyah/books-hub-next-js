@@ -109,7 +109,7 @@ function Form({ mode, book }: FormProps) {
   const descriptionContent = watch(
     'description',
     mode == 'edit' ? book.bookDetail.description || '' : ''
-  ) as string;
+  );
 
   const onAddWriters = () => {
     const writer = getValues('writers');
@@ -270,7 +270,7 @@ function Form({ mode, book }: FormProps) {
           <div>
             <div className='flex justify-between items-center'>
               <Label htmlFor='about'>About</Label>
-              <Text tag='p'>{descriptionContent?.length}/1000</Text>
+              <Text tag='p'>{descriptionContent?.length || 0}/1000</Text>
             </div>
             <Textarea
               className='h-[250px]'
