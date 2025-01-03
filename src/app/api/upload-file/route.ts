@@ -26,8 +26,8 @@ export async function POST(req: Request) {
 
     let imageUrl = '';
     if (isUploadSuccess && isRevalidateSuccess) {
-      console.log('ALL GREAT');
       imageUrl = `${process.env.CLOUDFRONT}/${pathUpload}/${fileKeyWithExt}`;
+      console.log('ALL GREAT', imageUrl);
     }
 
     await db.$transaction(async (tx) => {
