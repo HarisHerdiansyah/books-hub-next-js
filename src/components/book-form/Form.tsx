@@ -272,13 +272,13 @@ function Form({ mode, book }: FormProps) {
           <div>
             <div className='flex justify-between items-center'>
               <Label htmlFor='description'>Description</Label>
-              <Text tag='p'>{descriptionContent?.length}/1000</Text>
+              <Text tag='p'>{descriptionContent?.length}/5000</Text>
             </div>
             <Textarea
               className='h-[250px]'
-              maxLength={1000}
+              maxLength={5000}
               id='description'
-              placeholder='Enter book description (max 1000 characters)'
+              placeholder='Enter book description (max 5000 characters)'
               {...register('description')}
             />
             {errors.description && (
