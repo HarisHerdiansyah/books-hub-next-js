@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import Spinner from '@/components/general/Spinner';
+import { Text } from '../typography';
 import { addNewBook, updateBook } from '@/service/book';
 import { CATEGORIES_DROPDOWN, toasterProps } from '@/lib/constants';
 import { useAsyncToast } from '@/hooks';
@@ -37,7 +38,7 @@ const bookSchema = z.object({
     }),
   description: z
     .string()
-    .max(500, 'Description cannot exceed 500 characters.')
+    .max(1000, 'Description cannot exceed 1000 characters.')
     .optional(),
 });
 
@@ -83,6 +84,7 @@ function Form({ mode, book }: FormProps) {
     setValue,
     getValues,
     formState: { errors },
+    watch,
   } = useForm<AddBookFormValues>({
     resolver: zodResolver(bookSchema),
     defaultValues: {
@@ -104,6 +106,10 @@ function Form({ mode, book }: FormProps) {
   const router = useRouter();
   const session = useSession();
   const { execute, loading } = useAsyncToast();
+  const descriptionContent = watch(
+    'description',
+    mode == 'edit' ? book.bookDetail.description || '' : ''
+  ) as string;
 
   const onAddWriters = () => {
     const writer = getValues('writers');
@@ -262,10 +268,15 @@ function Form({ mode, book }: FormProps) {
         </div>
         {mode === 'edit' && book.isDone && (
           <div>
-            <Label htmlFor='description'>Description</Label>
+            <div className='flex justify-between items-center'>
+              <Label htmlFor='about'>About</Label>
+              <Text tag='p'>{descriptionContent.length}/1000</Text>
+            </div>
             <Textarea
+              className='h-[250px]'
+              maxLength={1000}
               id='description'
-              placeholder='Enter book description (max 500 characters)'
+              placeholder='Enter book description (max 1000 characters)'
               {...register('description')}
             />
             {errors.description && (

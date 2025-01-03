@@ -1,7 +1,7 @@
 'use client';
 
+import { useState } from 'react';
 import { AxiosError } from 'axios';
-import { signOut } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import Spinner from '@/components/general/Spinner';
+import SignOutDialog from './SignOutDialog';
 import { updatePassword } from '@/service/account';
 import { useToast } from '@/hooks';
 import { toasterProps } from '@/lib/constants';
@@ -41,16 +42,13 @@ export default function EditPasswordForm() {
     resolver: zodResolver(editPasswordSchema),
   });
 
+  const [open, setOpen] = useState<boolean>(false);
   const { toast } = useToast();
 
   const onSubmit = async (data: EditPasswordFormValues) => {
     try {
       await updatePassword(data);
-      toast({
-        variant: 'success',
-        ...toasterProps.resetPassword.resolve(),
-      });
-      await signOut({ redirect: true, callbackUrl: '/login' });
+      setOpen(true);
     } catch (e: unknown) {
       if (e instanceof AxiosError && 'response' in e) {
         toast({
@@ -64,6 +62,7 @@ export default function EditPasswordForm() {
   return (
     <>
       {isSubmitting && <Spinner />}
+      <SignOutDialog open={open} onClose={() => setOpen(false)} />
       <Card className='w-full border border-[#392467]'>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
