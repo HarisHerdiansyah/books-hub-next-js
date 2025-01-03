@@ -271,7 +271,8 @@ function Form({ mode, book }: FormProps) {
             <div className='flex justify-between items-center'>
               <Label htmlFor='about'>About</Label>
               <Text tag='p'>
-                @ts-ignore
+                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+                {/* @ts-ignore */}
                 {descriptionContent?.length || 0}/1000
               </Text>
             </div>
