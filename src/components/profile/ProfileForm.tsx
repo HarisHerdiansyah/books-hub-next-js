@@ -164,7 +164,7 @@ function ProfileForm() {
         <div>
           <div className='flex justify-between items-center'>
             <Label htmlFor='about'>About</Label>
-            <Text tag='p'>{aboutContent.length}/200</Text>
+            <Text tag='p'>{aboutContent?.length}/200</Text>
           </div>
           <Textarea
             maxLength={200}

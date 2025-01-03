@@ -95,7 +95,7 @@ function Form({ mode, book }: FormProps) {
             book.categories?.includes(opt.value)
           )
         : [],
-      description: mode == 'edit' ? book.bookDetail.description || '' : '',
+      description: mode == 'edit' ? book?.bookDetail?.description || '' : '',
       visibility: book.visibility ? 'public' : 'private',
     },
   });
@@ -108,7 +108,9 @@ function Form({ mode, book }: FormProps) {
   const { execute, loading } = useAsyncToast();
   const descriptionContent = watch(
     'description',
-    mode == 'edit' ? book.bookDetail.description : ''
+    mode === 'edit' && book?.bookDetail?.description
+      ? book.bookDetail.description
+      : ''
   );
 
   const onAddWriters = () => {
@@ -269,12 +271,8 @@ function Form({ mode, book }: FormProps) {
         {mode === 'edit' && book.isDone && (
           <div>
             <div className='flex justify-between items-center'>
-              <Label htmlFor='about'>About</Label>
-              <Text tag='p'>
-                {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-                {/* @ts-ignore */}
-                {descriptionContent?.length || 0}/1000
-              </Text>
+              <Label htmlFor='description'>Description</Label>
+              <Text tag='p'>{descriptionContent?.length}/1000</Text>
             </div>
             <Textarea
               className='h-[250px]'
