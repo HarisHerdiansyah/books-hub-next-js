@@ -1,7 +1,7 @@
 'use client';
 
+import { useState } from 'react';
 import { AxiosError } from 'axios';
-import { signOut } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import Spinner from '@/components/general/Spinner';
+import SignOutDialog from './SignOutDialog';
 import { updateEmail } from '@/service/account';
 import { useToast } from '@/hooks';
 import { toasterProps } from '@/lib/constants';
@@ -33,16 +34,13 @@ export default function EditEmailForm() {
     resolver: zodResolver(editEmailSchema),
   });
 
+  const [open, setOpen] = useState<boolean>(false);
   const { toast } = useToast();
 
   const onSubmit = async (data: EditEmailFormValues) => {
     try {
       await updateEmail(data);
-      toast({
-        variant: 'success',
-        ...toasterProps.updateEmail.resolve(),
-      });
-      await signOut({ redirect: true, callbackUrl: '/login' });
+      setOpen(true);
     } catch (e: unknown) {
       if (e instanceof AxiosError && 'response' in e) {
         toast({
@@ -56,6 +54,7 @@ export default function EditEmailForm() {
   return (
     <>
       {isSubmitting && <Spinner />}
+      <SignOutDialog open={open} onClose={() => setOpen(false)} />
       <Card className='w-full border border-[#392467]'>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>

@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Spinner from '@/components/general/Spinner';
+import { Text } from '../typography';
 import { updateUserProfile } from '@/service/user';
 import { useToast } from '@/hooks';
 
@@ -41,6 +42,7 @@ function ProfileForm() {
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
   });
@@ -48,6 +50,7 @@ function ProfileForm() {
   const session = useSession();
   const router = useRouter();
   const { toast } = useToast();
+  const aboutContent = watch('about');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,9 +162,13 @@ function ProfileForm() {
           )}
         </div>
         <div>
-          <Label htmlFor='about'>About</Label>
+          <div className='flex justify-between items-center'>
+            <Label htmlFor='about'>About</Label>
+            <Text tag='p'>{aboutContent?.length}/200</Text>
+          </div>
           <Textarea
-            className='mt-2'
+            maxLength={200}
+            className='mt-2 h-[80px]'
             id='about'
             placeholder='Tell us about yourself'
             {...register('about')}

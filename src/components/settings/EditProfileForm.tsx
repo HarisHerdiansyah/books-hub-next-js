@@ -1,5 +1,6 @@
 'use client';
 
+import { AxiosError } from 'axios';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -13,9 +14,9 @@ import { Textarea } from '@/components/ui/textarea';
 import ProfilePhotoForm from './ProfilePhotoForm';
 import { editUserProfile } from '@/service/user';
 import Spinner from '../general/Spinner';
+import { Text } from '../typography';
 import { useToast } from '@/hooks';
 import { toasterProps } from '@/lib/constants';
-import { AxiosError } from 'axios';
 
 const settingsSchema = z.object({
   username: z
@@ -49,6 +50,7 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
@@ -59,6 +61,8 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
       lastName,
     },
   });
+
+  const aboutContent = watch('about', about as string);
 
   const onSubmit = async (data: SettingsFormValues) => {
     const prev = { about, bio, username, firstName, lastName };
@@ -101,6 +105,7 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
             <div>
               <Label htmlFor='username'>Username</Label>
               <Input
+                autoComplete='off'
                 className='mt-3'
                 id='username'
                 type='text'
@@ -116,6 +121,7 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
             <div>
               <Label htmlFor='bio'>Bio</Label>
               <Input
+                autoComplete='off'
                 className='mt-3'
                 id='bio'
                 type='text'
@@ -131,6 +137,7 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
             <div>
               <Label htmlFor='firstName'>First Name</Label>
               <Input
+                autoComplete='off'
                 className='mt-3'
                 id='firstName'
                 type='text'
@@ -146,6 +153,7 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
             <div>
               <Label htmlFor='lastName'>Last Name</Label>
               <Input
+                autoComplete='off'
                 className='mt-3'
                 id='lastName'
                 type='text'
@@ -160,9 +168,13 @@ function EditProfileForm({ userProps }: { userProps: UserFormProps | null }) {
             </div>
           </div>
           <div>
-            <Label htmlFor='about'>About</Label>
+            <div className='flex justify-between items-center'>
+              <Label htmlFor='about'>About</Label>
+              <Text tag='p'>{aboutContent.length}/200</Text>
+            </div>
             <Textarea
-              className='mt-3'
+              maxLength={200}
+              className='mt-3 h-[80px]'
               id='about'
               placeholder='Describe yourself (max 200 characters)'
               {...register('about')}

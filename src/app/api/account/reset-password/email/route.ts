@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     await emailjs.send(
       process.env.EMAILJS_SERVICE_ID as string,
-      process.env.EMAILJS_TEMPLATE_ID as string,
+      process.env.EMAILJS_TEMPLATE_RESET_PASSWORD as string,
       {
         name: username,
         reset_link: `${process.env.BASE_URL}/reset-password?token=${token}`,
