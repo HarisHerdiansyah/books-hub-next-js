@@ -38,7 +38,7 @@ const bookSchema = z.object({
     }),
   description: z
     .string()
-    .max(1000, 'Description cannot exceed 1000 characters.')
+    .max(5000, 'Description cannot exceed 5000 characters.')
     .optional(),
 });
 
