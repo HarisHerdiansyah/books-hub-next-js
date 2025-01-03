@@ -1,5 +1,7 @@
 'use client';
 
+import { AxiosError } from 'axios';
+import { signOut } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,13 +9,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-// import { Text } from '../typography';
+import Spinner from '@/components/general/Spinner';
+import { updateEmail } from '@/service/account';
+import { useToast } from '@/hooks';
+import { toasterProps } from '@/lib/constants';
 
 // Zod schema for validation
 const editEmailSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  username: z.string().min(10, 'Username must be at least 10 characters'),
   newEmail: z.string().email('Invalid email address'),
 });
 
@@ -28,16 +33,29 @@ export default function EditEmailForm() {
     resolver: zodResolver(editEmailSchema),
   });
 
-  const onSubmit = (data: EditEmailFormValues) => {
-    /* eslint-disable no-console */
-    console.log('Edit Email Form Data:', data);
+  const { toast } = useToast();
+
+  const onSubmit = async (data: EditEmailFormValues) => {
+    try {
+      await updateEmail(data);
+      toast({
+        variant: 'success',
+        ...toasterProps.updateEmail.resolve(),
+      });
+      await signOut({ redirect: true, callbackUrl: '/login' });
+    } catch (e: unknown) {
+      if (e instanceof AxiosError && 'response' in e) {
+        toast({
+          variant: 'destructive',
+          ...toasterProps.updateEmail.reject(e.response?.data.message),
+        });
+      }
+    }
   };
 
   return (
     <>
-      {/* <div className='bg-[#392467] text-white p-2 rounded-xl mt-10 mb-3'>
-        <Text tag='h3'>Edit Email</Text>
-      </div> */}
+      {isSubmitting && <Spinner />}
       <Card className='w-full border border-[#392467]'>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
@@ -45,6 +63,7 @@ export default function EditEmailForm() {
               <div>
                 <Label htmlFor='username'>Username</Label>
                 <Input
+                  autoComplete='off'
                   id='username'
                   type='text'
                   placeholder='Enter your username'
@@ -59,6 +78,7 @@ export default function EditEmailForm() {
               <div>
                 <Label htmlFor='email'>Email</Label>
                 <Input
+                  autoComplete='off'
                   id='email'
                   type='email'
                   placeholder='Enter your email'
@@ -73,6 +93,7 @@ export default function EditEmailForm() {
               <div>
                 <Label htmlFor='password'>Password</Label>
                 <Input
+                  autoComplete='off'
                   id='password'
                   type='password'
                   placeholder='Enter your password'
@@ -87,6 +108,7 @@ export default function EditEmailForm() {
               <div>
                 <Label htmlFor='newEmail'>New Email</Label>
                 <Input
+                  autoComplete='off'
                   id='newEmail'
                   type='email'
                   placeholder='Enter your new email'

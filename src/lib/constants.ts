@@ -158,4 +158,14 @@ export const toasterProps = {
       description: msg,
     }),
   },
+  updateEmail: {
+    resolve: () => ({
+      title: 'Success',
+      description: 'Email is updated',
+    }),
+    reject: (msg: string) => ({
+      title: 'Failed',
+      description: msg,
+    }),
+  },
 };

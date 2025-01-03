@@ -27,3 +27,7 @@ export async function updatePassword(
 ) {
   return await api.post('/api/account/reset-password/update', payload);
 }
+
+export async function updateEmail(payload: Credentials & { newEmail: string }) {
+  return await api.post('/api/account/update-email', payload);
+}
