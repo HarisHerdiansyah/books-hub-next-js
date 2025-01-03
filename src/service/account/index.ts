@@ -1,6 +1,4 @@
-import { redirect } from 'next/navigation';
 import api from '@/lib/api';
-import { axiosErrorLogger } from '@/lib/utils';
 
 type Credentials = {
   username: string;
@@ -21,10 +19,15 @@ export async function sendEmailResetPassword(
 export async function resetPassword(
   payload: Pick<Credentials, 'email'> & { newPassword: string }
 ) {
-  try {
-    await api.post('/api/account/reset-password', payload);
-    redirect('/login');
-  } catch (e) {
-    axiosErrorLogger(e);
-  }
+  return await api.post('/api/account/reset-password', payload);
+}
+
+export async function updatePassword(
+  payload: Pick<Credentials, 'email'> & { newPassword: string }
+) {
+  return await api.post('/api/account/reset-password/update', payload);
+}
+
+export async function updateEmail(payload: Credentials & { newEmail: string }) {
+  return await api.post('/api/account/update-email', payload);
 }

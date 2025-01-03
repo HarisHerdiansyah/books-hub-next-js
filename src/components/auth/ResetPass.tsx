@@ -1,5 +1,7 @@
 'use client';
 
+import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -9,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Text } from '@/components/typography';
-import { useAsyncToast } from '@/hooks';
+import { useToast } from '@/hooks';
 import { resetPassword } from '@/service/account';
 import Spinner from '@/components/general/Spinner';
 import { toasterProps } from '@/lib/constants';
@@ -17,14 +19,10 @@ import { toasterProps } from '@/lib/constants';
 const resetPasswordSchema = z
   .object({
     email: z.string().email('Please enter a valid email address.'),
-    newPassword: z
-      .string()
-      .min(8, 'Password must be at least 8 characters.')
-      .max(16, 'Password must be less than 16 characters.'),
+    newPassword: z.string().min(8, 'Password must be at least 8 characters.'),
     confirmNewPassword: z
       .string()
-      .min(8, 'Password must be at least 8 characters.')
-      .max(16, 'Password must be less than 16 characters.'),
+      .min(8, 'Password must be at least 8 characters.'),
   })
   .refine((data) => data.newPassword === data.confirmNewPassword, {
     path: ['confirmNewPassword'],
@@ -42,15 +40,30 @@ function ResetPasswordForm() {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const { execute, loading } = useAsyncToast();
+  const { toast } = useToast();
+  const { replace } = useRouter();
 
-  const onSubmit = (data: ResetPasswordFormValues) => {
-    execute(async () => await resetPassword(data), toasterProps.resetPassword);
+  const onSubmit = async (data: ResetPasswordFormValues) => {
+    try {
+      await resetPassword(data);
+      toast({
+        variant: 'success',
+        ...toasterProps.resetPassword.resolve(),
+      });
+      replace('/login');
+    } catch (e: unknown) {
+      if (e instanceof AxiosError && 'response' in e) {
+        toast({
+          variant: 'destructive',
+          ...toasterProps.resetPassword.reject(e.response?.data.message),
+        });
+      }
+    }
   };
 
   return (
     <div className='flex items-center justify-center min-h-screen bg-gray-100 px-2'>
-      {loading && <Spinner />}
+      {isSubmitting && <Spinner />}
       <Card className='w-full max-w-md'>
         <CardHeader>
           <CardTitle className='text-center'>Reset Password</CardTitle>
