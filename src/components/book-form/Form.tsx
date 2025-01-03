@@ -271,7 +271,8 @@ function Form({ mode, book }: FormProps) {
             <div className='flex justify-between items-center'>
               <Label htmlFor='about'>About</Label>
               <Text tag='p'>
-                {descriptionContent ? descriptionContent.length : 0}/1000
+                @ts-ignore
+                {descriptionContent?.length || 0}/1000
               </Text>
             </div>
             <Textarea
